@@ -1,14 +1,16 @@
 {
-  "name": "final-auth-project",
+  "name": "coffeeshop-api",
   "version": "1.0.0",
-  "description": "Secure authentication with JWT, bcrypt, and email service",
-  "main": "index.js",
+  "description": "Coffee Shop REST API with authentication",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node seed.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
