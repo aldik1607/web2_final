@@ -2,7 +2,8 @@
 //  api.js - API base URL and fetch helper
 // ============================================
 
-const API = 'http://localhost:3000/api';
+// Same-origin API base; works in local and deployed environments.
+const API = '/api';
 
 // Makes a fetch request to the API
 // Automatically adds the Authorization header if a token exists

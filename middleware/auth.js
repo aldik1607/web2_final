@@ -35,4 +35,12 @@ const adminOnly = (req, res, next) => {
   next();
 };
 
-module.exports = { protect, adminOnly };
+// Admin or moderator middleware
+const adminOrModerator = (req, res, next) => {
+  if (!['admin', 'moderator'].includes(req.user.role)) {
+    return res.status(403).json({ message: 'Admin or moderator access required' });
+  }
+  next();
+};
+
+module.exports = { protect, adminOnly, adminOrModerator };

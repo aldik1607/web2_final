@@ -40,19 +40,35 @@ function renderProducts() {
     return;
   }
 
-  var isAdmin = currentUser && currentUser.role === 'admin';
+  var loggedIn = !!currentUser;
+  var canEdit = loggedIn && ['admin', 'moderator'].includes(currentUser.role);
+  var canDelete = loggedIn && currentUser.role === 'admin';
+  var isPremium = loggedIn && currentUser.role === 'premium';
   var html    = '';
 
   for (var i = 0; i < list.length; i++) {
     var p = list[i];
 
-    var adminBtns = '';
-    if (isAdmin) {
-      adminBtns =
-        '<div class="admin-btns">' +
-          '<button class="btn-edit" onclick="openModal(\'' + p._id + '\')">Edit</button>' +
-          '<button class="btn-delete" onclick="deleteProduct(\'' + p._id + '\')">Delete</button>' +
-        '</div>';
+    var actionBtns = '';
+    if (canEdit) {
+      actionBtns += '<button class="btn-edit" onclick="openModal(\'' + p._id + '\')">Edit</button>';
+    }
+    if (canDelete) {
+      actionBtns += '<button class="btn-delete" onclick="deleteProduct(\'' + p._id + '\')">Delete</button>';
+    }
+    if (loggedIn) {
+      actionBtns += '<button class="btn-save" onclick="placeOrder(\'' + p._id + '\')">Order</button>';
+    }
+    if (actionBtns) {
+      actionBtns = '<div class="admin-btns">' + actionBtns + '</div>';
+    }
+
+    var priceHtml = '$' + Number(p.price).toFixed(2);
+    if (isPremium) {
+      var discounted = Number(p.price) * 0.9;
+      priceHtml =
+        '<span style="text-decoration:line-through;color:#888;">$' + Number(p.price).toFixed(2) + '</span> ' +
+        '<span style="color:#2e7d32;font-weight:bold;">$' + discounted.toFixed(2) + ' (Premium -10%)</span>';
     }
 
     html +=
@@ -60,10 +76,32 @@ function renderProducts() {
         '<h3>' + p.name + '</h3>' +
         '<div class="category">' + p.category + '</div>' +
         '<div class="desc">' + p.description + '</div>' +
-        '<div class="price">$' + Number(p.price).toFixed(2) + '</div>' +
-        adminBtns +
+        '<div class="price">' + priceHtml + '</div>' +
+        actionBtns +
       '</div>';
   }
 
   document.getElementById('productsGrid').innerHTML = html;
+}
+
+async function placeOrder(productId) {
+  if (!token) {
+    showToast('Please login to place orders');
+    showPage('login');
+    return;
+  }
+
+  try {
+    var data = await apiFetch('/orders', 'POST', {
+      items: [{ productId: productId, quantity: 1 }]
+    });
+
+    var order = data.order;
+    var discountMsg = order.discountAmount > 0
+      ? (' (Discount -$' + Number(order.discountAmount).toFixed(2) + ')')
+      : '';
+    showToast('Order placed! Total: $' + Number(order.total).toFixed(2) + discountMsg);
+  } catch (err) {
+    showToast('Order failed: ' + err.message);
+  }
 }

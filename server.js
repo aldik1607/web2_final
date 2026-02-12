@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Connect to Database
@@ -11,14 +12,21 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/products', require('./routes/products'));
+app.use('/api/orders', require('./routes/orders'));
 
 // Home route
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+});
+
+app.get('/api', (req, res) => {
   res.json({
     message: 'Freddie Coffee Shop API',
     endpoints: {
@@ -36,6 +44,13 @@ app.get('/', (req, res) => {
         create: 'POST /api/products (admin)',
         update: 'PUT /api/products/:id (admin)',
         delete: 'DELETE /api/products/:id (admin)'
+      },
+      orders: {
+        create: 'POST /api/orders (private)',
+        getAll: 'GET /api/orders (private)',
+        getOne: 'GET /api/orders/:id (private)',
+        update: 'PUT /api/orders/:id (admin/moderator)',
+        delete: 'DELETE /api/orders/:id (admin)'
       }
     }
   });

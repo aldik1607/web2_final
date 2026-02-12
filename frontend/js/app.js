@@ -33,8 +33,9 @@ function updateNavbar() {
   document.getElementById('logoutNavBtn').style.display   = loggedIn ? '' : 'none';
   document.getElementById('profileNavBtn').style.display  = loggedIn ? '' : 'none';
 
-  var isAdmin = loggedIn && currentUser && currentUser.role === 'admin';
-  document.getElementById('adminNavBtn').style.display = isAdmin ? '' : 'none';
+  var canManageProducts = loggedIn && currentUser &&
+    (currentUser.role === 'admin' || currentUser.role === 'moderator');
+  document.getElementById('adminNavBtn').style.display = canManageProducts ? '' : 'none';
 
   document.getElementById('userInfo').textContent = currentUser
     ? 'Hi, ' + currentUser.username + ' (' + currentUser.role + ')'

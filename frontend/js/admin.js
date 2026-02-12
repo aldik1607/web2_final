@@ -23,17 +23,21 @@ function renderAdminTable() {
     return;
   }
 
+  var canDelete = currentUser && currentUser.role === 'admin';
   var html = '';
   for (var i = 0; i < allProducts.length; i++) {
     var p = allProducts[i];
+    var deleteBtn = canDelete
+      ? (' <button class="btn-delete" onclick="deleteProduct(\'' + p._id + '\')">Delete</button>')
+      : '';
     html +=
       '<tr>' +
         '<td>' + p.name + '</td>' +
         '<td>' + p.category + '</td>' +
         '<td>$' + Number(p.price).toFixed(2) + '</td>' +
         '<td>' +
-          '<button class="btn-edit" onclick="openModal(\'' + p._id + '\')">Edit</button> ' +
-          '<button class="btn-delete" onclick="deleteProduct(\'' + p._id + '\')">Delete</button>' +
+          '<button class="btn-edit" onclick="openModal(\'' + p._id + '\')">Edit</button>' +
+          deleteBtn +
         '</td>' +
       '</tr>';
   }
